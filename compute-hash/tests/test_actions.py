@@ -9,7 +9,7 @@ import pytest
 
 pytest.importorskip("xefm.user_api")
 
-from compute_hash import actions  # noqa: E402
+from compute_hash import actions, logic  # noqa: E402
 
 
 class FakePath:
@@ -35,7 +35,7 @@ def entry(name, data=b"", *, is_dir=False, error=None):
 
 class FakeJob:
     def __init__(self):
-        self.progress_calls = []
+        self.progress_calls, self.item_calls = [], []
 
     def checkpoint(self):
         pass
@@ -46,16 +46,14 @@ class FakeJob:
     def progress(self, done, total, *, detail=""):
         self.progress_calls.append((done, total, detail))
 
+    def item_progress(self, done, total):
+        self.item_calls.append((done, total))
+
 
 class FakeCtx:
-    def __init__(self, selected=(), focused=None, state=None, pick=None):
+    def __init__(self, selected=(), focused=None, pick=None):
         self.pane = SimpleNamespace(selected=lambda: list(selected),
                                     focused=focused)
-        store = dict(state or {})
-        self.extension = SimpleNamespace(state=SimpleNamespace(
-            get=lambda k, d=None: store.get(k, d),
-            set=store.__setitem__))
-        self.store = store
         self.pick = pick
         self.messages, self.shown, self.choices = [], [], []
 
@@ -76,11 +74,22 @@ class FakeCtx:
         self.shown.append((title, source))
 
 
+@pytest.fixture(autouse=True)
+def store(monkeypatch):
+    """The package's state, behind a fake ``extension(__name__)`` that, like
+    XeFM's, answers only for this package's own modules."""
+    data = {}
+    handle = SimpleNamespace(state=SimpleNamespace(
+        get=lambda k, d=None: data.get(k, d), set=data.__setitem__))
+    monkeypatch.setattr(actions, "extension",
+                        lambda module: handle if module.startswith("compute_hash.") else None)
+    return data
+
+
 def run(ctx):
     """The action, then the user's answer to its prompt — which, as in XeFM,
-    arrives after the action has returned and ctx.extension is gone."""
+    arrives after the action has returned."""
     actions.compute(ctx)
-    ctx.extension = None
     if ctx.choices:
         ctx.answer()
 
@@ -92,13 +101,13 @@ def test_no_files_says_so():
     assert ctx.choices == []
 
 
-def test_cancelled_choice_does_nothing():
+def test_cancelled_choice_does_nothing(store):
     ctx = FakeCtx(focused=entry("a.txt"))
     run(ctx)
-    assert ctx.shown == [] and ctx.store == {}
+    assert ctx.shown == [] and store == {}
 
 
-def test_hashes_selection_in_order_and_skips_dirs():
+def test_hashes_selection_in_order_and_skips_dirs(store):
     ctx = FakeCtx(selected=[entry("b.txt", b"b"), entry("dir", is_dir=True),
                             entry("a.txt", b"a")],
                   focused=entry("ignored"),
@@ -107,16 +116,16 @@ def test_hashes_selection_in_order_and_skips_dirs():
     (title, source), = ctx.shown
     assert title == "Compute Hash"
     assert ctx.choices[0][2] == "filter"
-    assert ctx.store == {"algorithm": "sha256"}
+    assert store == {"algorithm": "sha256"}
     sha = lambda d: hashlib.sha256(d).hexdigest()  # noqa: E731
     assert f"{sha(b'b')}  b.txt\n{sha(b'a')}  a.txt" in source
     assert source.startswith("**SHA-256**")
     assert ctx.job.progress_calls[-1] == (2, 2, "")
 
 
-def test_last_algorithm_is_offered_first():
-    ctx = FakeCtx(focused=entry("a.txt", b"x"), state={"algorithm": "md5"},
-                  pick=lambda items: 0)
+def test_last_algorithm_is_offered_first(store):
+    store["algorithm"] = "md5"
+    ctx = FakeCtx(focused=entry("a.txt", b"x"), pick=lambda items: 0)
     run(ctx)
     assert ctx.choices[0][1][0] == "MD5"
     assert hashlib.md5(b"x").hexdigest() in ctx.shown[0][1]
@@ -130,3 +139,13 @@ def test_unreadable_file_is_listed_apart():
     source = ctx.shown[0][1]
     assert f"{hashlib.sha1(b'1').hexdigest()}  ok.txt" in source
     assert "**Could not read**\n\n- no\\_\\*.txt: Permission denied" in source
+
+
+def test_large_file_moves_the_byte_bar(monkeypatch):
+    monkeypatch.setattr(logic, "CHUNK_SIZE", 4)
+    clock = iter(range(0, 1000))
+    monkeypatch.setattr(actions.time, "monotonic", lambda: next(clock))
+    ctx = FakeCtx(focused=entry("big.bin", b"0123456789ab"),
+                  pick=lambda items: items.index("MD5"))
+    run(ctx)
+    assert ctx.job.item_calls == [(4, 12), (8, 12), (12, 12)]

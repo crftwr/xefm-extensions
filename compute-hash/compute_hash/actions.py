@@ -4,11 +4,10 @@ without XeFM."""
 
 import time
 
-from xefm.user_api import md_code_block, md_escape
+from xefm.user_api import extension, md_code_block, md_escape
 
 from compute_hash.logic import (
-    checksum_line, digest_stream, error_text, ordered_algorithms,
-    progress_detail)
+    checksum_line, digest_stream, error_text, ordered_algorithms)
 
 TITLE = "Compute Hash"
 STATE_KEY = "algorithm"
@@ -29,16 +28,13 @@ def compute(ctx):
         ctx.message(f"{TITLE}: no files to hash")
         return
 
-    # Kept now: XeFM sets ctx.extension only while the action itself runs,
-    # and the choose callback comes after it has returned.
-    state = ctx.extension.state
-    algorithms = ordered_algorithms(state.get(STATE_KEY))
+    algorithms = ordered_algorithms(extension(__name__).state.get(STATE_KEY))
 
     def chosen(index):
         if index is None:
             return
         label, algorithm = algorithms[index]
-        state.set(STATE_KEY, algorithm)
+        extension(__name__).state.set(STATE_KEY, algorithm)
         _run(ctx, targets, label, algorithm)
 
     ctx.choose(f"{TITLE}: Algorithm", [label for label, _ in algorithms],
@@ -55,16 +51,15 @@ def _run(ctx, targets, label, algorithm):
                 size = path.stat().st_size
             except Exception:
                 size = 0                # unknown: the open below says why
-            # The bar counts files; the detail line shows how far into this
-            # one, a few times a second, so one large file still moves.
+            # The bar counts files; a second bar shows how far into this one,
+            # updated a few times a second, so one large file still moves.
             shown = [time.monotonic()]
 
-            def on_read(read, i=i, name=name, size=size):
+            def on_read(read, size=size):
                 now = time.monotonic()
-                if now - shown[0] >= 0.25:
+                if size and now - shown[0] >= 0.25:
                     shown[0] = now
-                    job.progress(i, len(targets),
-                                 detail=progress_detail(name, read, size))
+                    job.item_progress(read, size)
 
             try:
                 with path.open("rb") as stream:
