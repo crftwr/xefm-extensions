@@ -32,6 +32,19 @@ XeFM skill to vX.Y.Z"), then check and test every package against that
 version (next section). Do not edit the skill by hand. Report mistakes in it
 on crftwr/xefm.
 
+**Is the installed skill current?** The skill does not record its version
+(crftwr/xefm#690), so compare it with the latest release's zip instead. After
+the download above, unzip it next to the zip and diff:
+
+```bash
+unzip -q $T/skill.zip -d $T && diff -rq $T/xefm .claude/skills/xefm \
+  && echo "up to date with $V"
+```
+
+No output other than "up to date" means nothing to do. A difference means the
+installed skill is older, or was generated from main. The last commit that
+touched `.claude/skills/xefm/` says which.
+
 Between releases, when a package needs API that is on XeFM's main but not
 released, generate the skill from main instead:
 `PYTHONPATH=$X $PY -m xefm ext skill --install <scratch>/skill` (see below for
