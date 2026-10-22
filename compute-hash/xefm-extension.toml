@@ -1,0 +1,15 @@
+[extension]
+id = "compute-hash"
+version = "0.1.0"
+api_version = 0
+name = "Compute Hash"
+description = "Compute MD5, SHA-1, SHA-256, SHA-512 or BLAKE2b digests of the selected files"
+min_xefm = "1.9.0"
+homepage = "https://github.com/crftwr/xefm-extensions/tree/main/compute-hash"
+updates = "github:crftwr/xefm-extensions/compute-hash"
+
+[contributes.actions]
+"hash.compute" = "compute_hash.actions:compute"
+
+[contributes.menus]
+"hash.compute" = { menus = ["file", "context"], label = "Compute Hash…", when = "entry" }
