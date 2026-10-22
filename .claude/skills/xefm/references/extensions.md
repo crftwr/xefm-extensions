@@ -158,8 +158,8 @@ The function's docstring is its help text (first line = one-line summary).
 modules, and from each only the names in its `__all__`:
 
 - `xefm.user_api.__all__` — `API_VERSION`, `PREVIEW_APIS`,
-  `ActionContext`, `PaneApi`, `EntryInfo`, `HookEvent`, `TaskJob`,
-  `TaskOutcome`, `md_code_block`, `md_escape`
+  `ActionContext`, `PaneApi`, `EntryInfo`, `HookEvent`, `extension`,
+  `TaskJob`, `TaskOutcome`, `md_code_block`, `md_escape`
 - `xefm.path_base.__all__` — `ReadOnlyPathImpl`, `UriStatResult`
 
 Anything else those modules happen to contain (`run_guarded`,
@@ -217,7 +217,8 @@ The public names:
 - `ctx.confirm(prompt, *, title="Confirm", on_result=None)` — `on_result` gets
   `True`/`False`
 - `ctx.api_version`, `ctx.action_names()`
-- `ctx.extension` — this package's handle (below)
+- `extension(__name__)` — this package's handle (below); import it from
+  `xefm.user_api`
 
 `PaneApi` (`ctx.pane`):
 
@@ -241,7 +242,12 @@ use `path` for any file operation), `is_dir`, `is_link`, `is_file`,
 `stem`, `suffix`, `size`, `mtime`. `size`/`mtime` cost a `stat` on first
 access; a predicate that only reads names stays fast.
 
-`ctx.extension` (`None` for actions defined in `config.py`):
+`extension(__name__)` — your package's handle, found from the calling
+module's name. It works anywhere in the package, at any time: in an action, in
+a prompt's callback after the action has returned, in a `run_task` worker, in a
+sort key. Call it where you need it. Older previews had ctx.extension; it
+was removed, and `xefm ext check` reports code that still uses it. `None` outside a loaded package, e.g.
+in `config.py`.
 
 - `id`, `version`
 - `settings` — your `settings.defaults` class's values, overlaid with the
@@ -279,7 +285,10 @@ def compute(ctx):
 - `work` may touch only `job` — never `ctx`, a pane, or an `EntryInfo`'s
   pane-backed fields. Take what it needs from `ctx` before starting it;
   `entry.path` and its `open('rb')` are fine on the worker.
-- `job.progress(done, total, *, detail="")` moves the bar; `job.checkpoint()`
+- `job.progress(done, total, *, detail="")` moves the bar;
+  `job.item_progress(done, total)` adds a byte bar for the current item (one
+  large file: call it as you read, a few times a second — do not fake a
+  percentage in `detail`); `job.checkpoint()`
   raises when cancelled (let it propagate — do not catch it in a broad
   `except Exception`); `job.cancelled()` asks without raising.
 - `on_done(ctx, outcome)` always runs once: `outcome.status` is `"done"`
@@ -325,7 +334,7 @@ class Settings:
 ```
 
 with `[settings] defaults = "hello_xefm.settings:Settings"`. Settings are the
-upper-case attributes. Read them as `ctx.extension.settings.GREETING`. The
+upper-case attributes. Read them as `extension(__name__).settings.GREETING`. The
 class name is the id in PascalCase plus `Config`; `xefm ext list` and
 `xefm ext check` print it, and `xefm ext settings <id>` prints a
 ready-to-paste class with every default. Tell the user that name; do not
