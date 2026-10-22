@@ -48,13 +48,6 @@ def digest_stream(stream, algorithm, should_stop=None, on_read=None):
             on_read(read)
 
 
-def progress_detail(name, read, size):
-    """The progress dialog's line for a file being read: its name, and how
-    far into it, when its size is known."""
-    if not size:
-        return name
-    return f"{name} — {min(100, read * 100 // size)}%"
-
 
 def checksum_line(digest, name):
     """One line in the form ``sha256sum`` (and ``md5sum``, ``b2sum``, …)

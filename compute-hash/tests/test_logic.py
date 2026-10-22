@@ -6,7 +6,7 @@ import pytest
 from compute_hash import logic
 from compute_hash.logic import (
     ALGORITHMS, Stopped, checksum_line, digest_stream, error_text,
-    ordered_algorithms, progress_detail)
+    ordered_algorithms)
 
 
 def test_ordered_algorithms_puts_last_used_first():
@@ -68,8 +68,3 @@ def test_digest_stream_reports_bytes_read(monkeypatch):
     seen = []
     digest_stream(io.BytesIO(b"0123456789"), "md5", on_read=seen.append)
     assert seen == [4, 8, 10]
-
-
-def test_progress_detail():
-    assert progress_detail("big.bin", 512, 2048) == "big.bin — 25%"
-    assert progress_detail("big.bin", 512, 0) == "big.bin"

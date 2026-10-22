@@ -14,8 +14,8 @@ xefm ext install github:crftwr/xefm-extensions/compute-hash
 
 Then run **Tools ▸ Reload Configuration** in XeFM, or restart it.
 
-Needs XeFM 1.9.0 or later (it uses `ctx.run_task`, `ctx.show_markdown` and
-`[contributes.menus]`).
+Needs XeFM 1.9.0 or later (it uses `ctx.run_task` with `job.item_progress`,
+`ctx.show_markdown`, `extension(__name__)` and `[contributes.menus]`).
 
 ## Use
 
@@ -28,7 +28,8 @@ Needs XeFM 1.9.0 or later (it uses `ctx.run_task`, `ctx.show_markdown` and
    is selected. Directories are skipped. Files on `ssh://`, `s3://` and inside
    archives are read through XeFM, the same as local ones.
 3. Hashing runs as a task: a progress dialog with Cancel and *Run in
-   background*. It is read-only, so it does not wait behind a background copy.
+   background*, and a byte bar for the file being read. It is read-only, so
+   it does not wait behind a background copy.
 4. The result shows one line per file, in selection order:
 
    ```
