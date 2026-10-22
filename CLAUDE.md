@@ -82,9 +82,9 @@ committing.
   answers it *after* the action has returned, as XeFM does. Tests that answer
   inside the call miss bugs such as crftwr/xefm#679.
 - Patch `actions.extension` with a fake that answers only for the package's
-  own modules (see `compute-hash/tests/test_actions.py`). The skill's own
-  testing example still passes `extension=` on `ctx`, which no longer exists
-  and which `xefm ext check` rejects.
+  own modules (see `compute-hash/tests/test_actions.py`). Do not copy the
+  skill's thin-wrapper example as it stands: it still passes `extension=` on
+  `ctx` and does not run against the scaffold (crftwr/xefm#689).
 - Per-item error handling with a broad `except Exception` around
   `job.checkpoint()`: call `job.checkpoint()` again in the `except`, so a
   cancel ends the task instead of being recorded as that item's error.
