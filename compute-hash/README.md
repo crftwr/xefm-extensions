@@ -8,14 +8,36 @@ in a form you can paste into `sha256sum -c`.
 
 ## Install
 
+Needs XeFM 1.9.0 or later. The desktop app and the terminal app share
+`~/.xefm`, so either way below installs it for both.
+
+**With the `xefm` command** (pip, pipx, uv or the Homebrew formula):
+
 ```bash
 xefm ext install github:crftwr/xefm-extensions/compute-hash
 ```
 
 Then run **Tools ▸ Reload Configuration** in XeFM, or restart it.
 
-Needs XeFM 1.9.0 or later (it uses `ctx.run_task` with `job.item_progress`,
-`ctx.show_markdown`, `extension(__name__)` and `[contributes.menus]`).
+**In the desktop app** (macOS, Windows), which has no `xefm` command:
+
+1. Download
+   [main.zip](https://github.com/crftwr/xefm-extensions/archive/refs/heads/main.zip).
+   Once 0.1.0 is released, its tag's zip,
+   [compute-hash-v0.1.0.zip](https://github.com/crftwr/xefm-extensions/archive/refs/tags/compute-hash-v0.1.0.zip),
+   gives that exact version.
+2. Extract it: put the cursor on the zip and choose **File ▸ Extract
+   Archive…** (XeFM extracts into the other pane's folder), or use Finder /
+   Explorer. The zip itself cannot be installed, because the package is in a
+   subfolder.
+3. Open the extracted folders until you see `compute-hash`, put the cursor on
+   it and choose **Tools ▸ Advanced ▸ Install Extension…**.
+4. XeFM lists what the package adds: the `hash.compute` action and its menu
+   items. Choose **Install** (the dialog starts on Cancel). XeFM reloads its
+   configuration, and **File ▸ Compute Hash…** appears.
+
+It uses `ctx.run_task` with `job.item_progress`, `ctx.show_markdown`,
+`extension(__name__)` and `[contributes.menus]`, which are new in 1.9.0.
 
 ## Use
 
