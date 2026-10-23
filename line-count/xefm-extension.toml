@@ -1,0 +1,15 @@
+[extension]
+id = "line-count"
+version = "0.1.0"
+api_version = 0
+name = "Line Count"
+description = "Count lines, words and characters of the selected files"
+min_xefm = "1.9.0"
+homepage = "https://github.com/crftwr/xefm-extensions/tree/main/line-count"
+updates = "github:crftwr/xefm-extensions/line-count"
+
+[contributes.actions]
+"count.lines" = "line_count.actions:count_lines"
+
+[contributes.menus]
+"count.lines" = { menus = ["file", "context"], label = "Count Lines…", when = "entry" }
