@@ -6,11 +6,19 @@ someone who has no AWS access.
 
 ## Install
 
-Needs XeFM 1.10.0 or later. On XeFM 1.9.0, install version
-0.1.0 instead: add `@s3-share-v0.1.0` to the source below, or download
-[s3-share-v0.1.0.zip](https://github.com/crftwr/xefm-extensions/archive/refs/tags/s3-share-v0.1.0.zip)
-in the desktop app's step 1. The desktop app and the terminal app share
+Needs XeFM 1.10.0 or later. The desktop app and the terminal app share
 `~/.xefm`, so either way below installs it for both.
+
+**Inside XeFM** (desktop app or terminal): choose **Tools ▸ Advanced ▸ Install
+Extension…** and paste
+
+```text
+github:crftwr/xefm-extensions/s3-share
+```
+
+XeFM downloads and checks the package and lists what it adds: the
+`s3-share.presign` action and its context-menu item. Choose **Install** (the
+dialog starts on Cancel); XeFM reloads its configuration.
 
 **With the `xefm` command** (pip, pipx, uv or the Homebrew formula):
 
@@ -20,22 +28,12 @@ xefm ext install github:crftwr/xefm-extensions/s3-share
 
 Then run **Tools ▸ Reload Configuration** in XeFM, or restart it.
 
-**In the desktop app** (macOS, Windows), which has no `xefm` command:
-
-1. Download
-   [main.zip](https://github.com/crftwr/xefm-extensions/archive/refs/heads/main.zip).
-   A release's tag zip, such as
-   [s3-share-v0.2.0.zip](https://github.com/crftwr/xefm-extensions/archive/refs/tags/s3-share-v0.2.0.zip),
-   gives that exact version.
-2. Extract it: put the cursor on the zip and choose **File ▸ Extract
-   Archive…** (XeFM extracts into the other pane's folder), or use Finder /
-   Explorer. The zip itself cannot be installed, because the package is in a
-   subfolder.
-3. Open the extracted folders until you see `s3-share`, put the cursor on it
-   and choose **Tools ▸ Advanced ▸ Install Extension…**.
-4. XeFM lists what the package adds: the `s3-share.presign` action and its
-   context-menu item. Choose **Install** (the dialog starts on Cancel). XeFM
-   reloads its configuration.
+**On XeFM 1.9.0**, install version 0.1.0 instead: add `@s3-share-v0.1.0` to the
+source for the `xefm` command. 1.9.0's Install Extension takes only the package
+under the cursor, so in the app download
+[s3-share-v0.1.0.zip](https://github.com/crftwr/xefm-extensions/archive/refs/tags/s3-share-v0.1.0.zip),
+extract it (**File ▸ Extract Archive…**), open the extracted folder, put the
+cursor on `s3-share` and choose **Tools ▸ Advanced ▸ Install Extension…**.
 
 It uses boto3, which XeFM already includes for its S3 support.
 

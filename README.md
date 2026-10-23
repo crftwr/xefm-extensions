@@ -15,8 +15,22 @@ manager. Each folder is one package with its own `xefm-extension.toml`.
 
 ## Installing a package
 
-The desktop app and the terminal app share `~/.xefm`. A package installed
-either way is available in both.
+Every package needs XeFM 1.10.0 or later. The desktop app and the terminal app
+share `~/.xefm`. A package installed either way is available in both.
+
+### Inside XeFM
+
+In the desktop app or the terminal app, choose **Tools ▸ Advanced ▸ Install
+Extension…** and paste the package's source:
+
+```text
+github:crftwr/xefm-extensions/<package>
+```
+
+XeFM downloads and checks the package and lists everything it adds. Choose
+**Install** (the dialog starts on Cancel). XeFM reloads its configuration and
+the package is ready. For a released version, add its tag:
+`github:crftwr/xefm-extensions/<package>@<package>-v<version>`.
 
 ### With the `xefm` command
 
@@ -29,24 +43,15 @@ xefm ext install github:crftwr/xefm-extensions/<package>
 
 Then run **Tools ▸ Reload Configuration** in XeFM, or restart it.
 
-### In the desktop app (macOS, Windows)
+### On XeFM 1.9.0
 
-The desktop app does not add an `xefm` command, so install from inside XeFM:
-
-1. Download this repository as a zip:
-   [main.zip](https://github.com/crftwr/xefm-extensions/archive/refs/heads/main.zip).
-   For a released version, download its tag's zip instead:
-   `https://github.com/crftwr/xefm-extensions/archive/refs/tags/<id>-v<version>.zip`.
-2. Extract it: put the cursor on the zip and choose **File ▸ Extract
-   Archive…** (XeFM extracts into the other pane's folder), or use Finder /
-   Explorer. The zip itself cannot be installed, because the packages are
-   inside subfolders.
-3. Open the extracted folders until you see the package's folder (for example
-   `xefm-extensions-main/compute-hash`). Put the cursor on it and choose
-   **Tools ▸ Advanced ▸ Install Extension…**.
-4. XeFM checks the package and lists everything it adds. Choose **Install**
-   (the dialog starts on Cancel). XeFM reloads its configuration and the
-   package is ready.
+Install a package's 0.1.0 release: add `@<package>-v0.1.0` to the source for
+the `xefm` command. 1.9.0's Install Extension takes only the package under the
+cursor, so in the desktop app download the tag's zip
+(`https://github.com/crftwr/xefm-extensions/archive/refs/tags/<package>-v0.1.0.zip`),
+extract it (**File ▸ Extract Archive…**), open the extracted folder, put the
+cursor on the package's folder and choose **Tools ▸ Advanced ▸ Install
+Extension…**.
 
 **Tools ▸ Advanced ▸ Extensions…** shows which packages loaded, and why any
 did not. Extensions run inside XeFM with your permissions, so install only

@@ -20,11 +20,18 @@ in the terminal and in the desktop app.
 
 ## Install
 
-Needs XeFM 1.10.0 or later. On XeFM 1.9.0, install version
-0.1.0 instead: add `@classic-blue-v0.1.0` to the source below, or download
-[classic-blue-v0.1.0.zip](https://github.com/crftwr/xefm-extensions/archive/refs/tags/classic-blue-v0.1.0.zip)
-in the desktop app's step 1. The desktop app and the terminal app share
+Needs XeFM 1.10.0 or later. The desktop app and the terminal app share
 `~/.xefm`, so either way below installs it for both.
+
+**Inside XeFM** (desktop app or terminal): choose **Tools ▸ Advanced ▸ Install
+Extension…** and paste
+
+```text
+github:crftwr/xefm-extensions/classic-blue
+```
+
+XeFM downloads and checks the package and lists what it adds: one theme. Choose
+**Install** (the dialog starts on Cancel); then restart XeFM.
 
 **With the `xefm` command** (pip, pipx, uv or the Homebrew formula):
 
@@ -35,21 +42,12 @@ xefm ext install github:crftwr/xefm-extensions/classic-blue
 Then **restart XeFM**. Tools ▸ Reload Configuration does not add a newly
 installed theme to the list yet (crftwr/xefm#708).
 
-**In the desktop app** (macOS, Windows), which has no `xefm` command:
-
-1. Download
-   [main.zip](https://github.com/crftwr/xefm-extensions/archive/refs/heads/main.zip).
-   A release's tag zip, such as
-   [classic-blue-v0.2.0.zip](https://github.com/crftwr/xefm-extensions/archive/refs/tags/classic-blue-v0.2.0.zip),
-   gives that exact version.
-2. Extract it: put the cursor on the zip and choose **File ▸ Extract
-   Archive…** (XeFM extracts into the other pane's folder), or use Finder /
-   Explorer. The zip itself cannot be installed, because the package is in a
-   subfolder.
-3. Open the extracted folders until you see `classic-blue`, put the cursor on
-   it and choose **Tools ▸ Advanced ▸ Install Extension…**.
-4. XeFM lists what the package adds: one theme. Choose **Install** (the dialog
-   starts on Cancel), then restart XeFM.
+**On XeFM 1.9.0**, install version 0.1.0 instead: add `@classic-blue-v0.1.0` to
+the source for the `xefm` command. 1.9.0's Install Extension takes only the
+package under the cursor, so in the app download
+[classic-blue-v0.1.0.zip](https://github.com/crftwr/xefm-extensions/archive/refs/tags/classic-blue-v0.1.0.zip),
+extract it (**File ▸ Extract Archive…**), open the extracted folder, put the
+cursor on `classic-blue` and choose **Tools ▸ Advanced ▸ Install Extension…**.
 
 ## Use
 
