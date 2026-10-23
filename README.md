@@ -6,6 +6,7 @@ manager. Each folder is one package with its own `xefm-extension.toml`.
 | Package | What it does |
 |---|---|
 | [compute-hash](compute-hash/) | MD5 / SHA-1 / SHA-256 / SHA-512 / BLAKE2b digests of the selected files |
+| [s3-share](s3-share/) | Copy a time-limited HTTPS link (presigned URL) to an S3 object |
 
 ## Installing a package
 
