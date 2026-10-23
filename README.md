@@ -6,6 +6,7 @@ manager. Each folder is one package with its own `xefm-extension.toml`.
 | Package | What it does |
 |---|---|
 | [compute-hash](compute-hash/) | MD5 / SHA-1 / SHA-256 / SHA-512 / BLAKE2b digests of the selected files |
+| [line-count](line-count/) | Lines, words and characters of the selected files and folders |
 
 ## Installing a package
 
