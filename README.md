@@ -6,6 +6,7 @@ manager. Each folder is one package with its own `xefm-extension.toml`.
 | Package | What it does |
 |---|---|
 | [compute-hash](compute-hash/) | MD5 / SHA-1 / SHA-256 / SHA-512 / BLAKE2b digests of the selected files |
+| [unblock-files](unblock-files/) | Remove the Mark of the Web from downloaded files (Windows) |
 
 ## Installing a package
 
