@@ -4,6 +4,8 @@ An [XeFM](https://github.com/crftwr/xefm) extension: a theme in the classic
 dual-pane look — a blue background, folders in white, files in cyan, and a
 yellow cursor cue.
 
+![Classic Blue in XeFM's terminal UI: folders in white, files in cyan, three selected rows, the yellow cursor cue in the focused right pane, and the teal key bar](docs/screenshot.png)
+
 | Element | Color |
 |---|---|
 | Background | blue `(0, 0, 128)` |
