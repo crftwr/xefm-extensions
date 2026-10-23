@@ -1,0 +1,12 @@
+[extension]
+id = "classic-blue"
+version = "0.1.0"
+api_version = 0
+name = "Classic Blue"
+description = "A blue-background theme in the classic dual-pane look"
+min_xefm = "1.9.0"
+homepage = "https://github.com/crftwr/xefm-extensions/tree/main/classic-blue"
+updates = "github:crftwr/xefm-extensions/classic-blue"
+
+[contributes.themes]
+"Classic Blue" = "classic_blue.theme:CLASSIC_BLUE"
