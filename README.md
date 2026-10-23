@@ -11,6 +11,7 @@ manager. Each folder is one package with its own `xefm-extension.toml`.
 | [line-count](line-count/) | Lines, words and characters of the selected files and folders |
 | [s3-share](s3-share/) | Copy a time-limited HTTPS link (presigned URL) to an S3 object |
 | [size-date-filters](size-date-filters/) | Pane filters for large files and recently modified files |
+| [unblock-files](unblock-files/) | Remove the Mark of the Web from downloaded files (Windows) |
 
 ## Installing a package
 

@@ -1,0 +1,16 @@
+[extension]
+id = "unblock-files"
+version = "0.1.0"
+api_version = 0
+name = "Unblock Files"
+description = "Remove the downloaded-from-the-internet mark (Mark of the Web) from files"
+min_xefm = "1.9.0"
+platforms = ["windows"]
+homepage = "https://github.com/crftwr/xefm-extensions/tree/main/unblock-files"
+updates = "github:crftwr/xefm-extensions/unblock-files"
+
+[contributes.actions]
+"unblock.files" = "unblock_files.actions:unblock"
+
+[contributes.menus]
+"unblock.files" = { menus = ["file", "context"], label = "Unblock…", when = "entry" }
