@@ -1,0 +1,18 @@
+[extension]
+id = "s3-share"
+version = "0.1.0"
+api_version = 0
+name = "S3 Share"
+description = "Copy a time-limited HTTPS link to an S3 object"
+min_xefm = "1.9.0"
+homepage = "https://github.com/crftwr/xefm-extensions/tree/main/s3-share"
+updates = "github:crftwr/xefm-extensions/s3-share"
+
+[contributes.actions]
+"s3-share.presign" = "s3_share.actions:presign"
+
+[contributes.menus]
+"s3-share.presign" = { menus = ["context"], label = "Copy Presigned URL…", when = "entry" }
+
+[requires]
+host_packages = ["boto3"]           # XeFM's own S3 support ships it
