@@ -6,6 +6,7 @@ manager. Each folder is one package with its own `xefm-extension.toml`.
 | Package | What it does |
 |---|---|
 | [compute-hash](compute-hash/) | MD5 / SHA-1 / SHA-256 / SHA-512 / BLAKE2b digests of the selected files |
+| [images-to-pdf](images-to-pdf/) | Combine the selected images into one PDF |
 
 ## Installing a package
 
