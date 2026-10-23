@@ -24,8 +24,11 @@ those protections too, so unblock only files you trust.
 
 ## Install
 
-Needs XeFM 1.9.0 or later, on Windows. On macOS and Linux XeFM skips the
-package ("not made for …").
+Needs XeFM 1.10.0 or later, on Windows. On XeFM 1.9.0, install version
+0.1.0 instead: add `@unblock-files-v0.1.0` to the source below, or download
+[unblock-files-v0.1.0.zip](https://github.com/crftwr/xefm-extensions/archive/refs/tags/unblock-files-v0.1.0.zip)
+in the desktop app's step 1. On macOS and Linux XeFM skips the package
+("not made for …").
 
 **With the `xefm` command** (pip, pipx or uv):
 
@@ -40,8 +43,8 @@ Then run **Tools ▸ Reload Configuration** in XeFM, or restart it.
 
 1. Download
    [main.zip](https://github.com/crftwr/xefm-extensions/archive/refs/heads/main.zip).
-   Once 0.1.0 is released, its tag's zip,
-   [unblock-files-v0.1.0.zip](https://github.com/crftwr/xefm-extensions/archive/refs/tags/unblock-files-v0.1.0.zip),
+   A release's tag zip, such as
+   [unblock-files-v0.2.0.zip](https://github.com/crftwr/xefm-extensions/archive/refs/tags/unblock-files-v0.2.0.zip),
    gives that exact version.
 2. Extract it: put the cursor on the zip and choose **File ▸ Extract
    Archive…** (XeFM extracts into the other pane's folder), or use Explorer.

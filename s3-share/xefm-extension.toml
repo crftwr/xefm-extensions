@@ -1,10 +1,10 @@
 [extension]
 id = "s3-share"
-version = "0.1.0"
-api_version = 0
+version = "0.2.0"
+api_version = 1
 name = "S3 Share"
 description = "Copy a time-limited HTTPS link to an S3 object"
-min_xefm = "1.9.0"
+min_xefm = "1.10.0"
 homepage = "https://github.com/crftwr/xefm-extensions/tree/main/s3-share"
 updates = "github:crftwr/xefm-extensions/s3-share"
 
