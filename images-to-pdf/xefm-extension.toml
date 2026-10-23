@@ -1,0 +1,18 @@
+[extension]
+id = "images-to-pdf"
+version = "0.1.0"
+api_version = 0
+name = "Images to PDF"
+description = "Combine the selected images into one PDF, one image per page"
+min_xefm = "1.9.0"
+homepage = "https://github.com/crftwr/xefm-extensions/tree/main/images-to-pdf"
+updates = "github:crftwr/xefm-extensions/images-to-pdf"
+
+[contributes.actions]
+"images-to-pdf.combine" = "images_to_pdf.actions:combine"
+
+[contributes.menus]
+"images-to-pdf.combine" = { menus = ["file", "context"], label = "Images to PDF…", when = "entry" }
+
+[requires]
+host_packages = ["PIL"]             # Pillow, which XeFM itself ships
