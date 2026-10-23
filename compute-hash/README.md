@@ -8,7 +8,10 @@ in a form you can paste into `sha256sum -c`.
 
 ## Install
 
-Needs XeFM 1.9.0 or later. The desktop app and the terminal app share
+Needs XeFM 1.10.0 or later. On XeFM 1.9.0, install version
+0.1.0 instead: add `@compute-hash-v0.1.0` to the source below, or download
+[compute-hash-v0.1.0.zip](https://github.com/crftwr/xefm-extensions/archive/refs/tags/compute-hash-v0.1.0.zip)
+in the desktop app's step 1. The desktop app and the terminal app share
 `~/.xefm`, so either way below installs it for both.
 
 **With the `xefm` command** (pip, pipx, uv or the Homebrew formula):
@@ -23,8 +26,8 @@ Then run **Tools ▸ Reload Configuration** in XeFM, or restart it.
 
 1. Download
    [main.zip](https://github.com/crftwr/xefm-extensions/archive/refs/heads/main.zip).
-   Once 0.1.0 is released, its tag's zip,
-   [compute-hash-v0.1.0.zip](https://github.com/crftwr/xefm-extensions/archive/refs/tags/compute-hash-v0.1.0.zip),
+   A release's tag zip, such as
+   [compute-hash-v0.2.0.zip](https://github.com/crftwr/xefm-extensions/archive/refs/tags/compute-hash-v0.2.0.zip),
    gives that exact version.
 2. Extract it: put the cursor on the zip and choose **File ▸ Extract
    Archive…** (XeFM extracts into the other pane's folder), or use Finder /

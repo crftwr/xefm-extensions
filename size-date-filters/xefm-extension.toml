@@ -1,10 +1,10 @@
 [extension]
 id = "size-date-filters"
-version = "0.1.0"
-api_version = 0
+version = "0.2.0"
+api_version = 1
 name = "Size & Date Filters"
 description = "Pane filters for large files and recently modified files"
-min_xefm = "1.9.0"
+min_xefm = "1.10.0"
 homepage = "https://github.com/crftwr/xefm-extensions/tree/main/size-date-filters"
 updates = "github:crftwr/xefm-extensions/size-date-filters"
 
