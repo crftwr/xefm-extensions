@@ -8,11 +8,20 @@ in a form you can paste into `sha256sum -c`.
 
 ## Install
 
-Needs XeFM 1.10.0 or later. On XeFM 1.9.0, install version
-0.1.0 instead: add `@compute-hash-v0.1.0` to the source below, or download
-[compute-hash-v0.1.0.zip](https://github.com/crftwr/xefm-extensions/archive/refs/tags/compute-hash-v0.1.0.zip)
-in the desktop app's step 1. The desktop app and the terminal app share
+Needs XeFM 1.10.0 or later. The desktop app and the terminal app share
 `~/.xefm`, so either way below installs it for both.
+
+**Inside XeFM** (desktop app or terminal): choose **Tools ▸ Advanced ▸ Install
+Extension…** and paste
+
+```text
+github:crftwr/xefm-extensions/compute-hash
+```
+
+XeFM downloads and checks the package and lists what it adds: the
+`hash.compute` action and its menu items. Choose **Install** (the dialog starts
+on Cancel); XeFM reloads its configuration, and **File ▸ Compute Hash…**
+appears.
 
 **With the `xefm` command** (pip, pipx, uv or the Homebrew formula):
 
@@ -22,22 +31,12 @@ xefm ext install github:crftwr/xefm-extensions/compute-hash
 
 Then run **Tools ▸ Reload Configuration** in XeFM, or restart it.
 
-**In the desktop app** (macOS, Windows), which has no `xefm` command:
-
-1. Download
-   [main.zip](https://github.com/crftwr/xefm-extensions/archive/refs/heads/main.zip).
-   A release's tag zip, such as
-   [compute-hash-v0.2.0.zip](https://github.com/crftwr/xefm-extensions/archive/refs/tags/compute-hash-v0.2.0.zip),
-   gives that exact version.
-2. Extract it: put the cursor on the zip and choose **File ▸ Extract
-   Archive…** (XeFM extracts into the other pane's folder), or use Finder /
-   Explorer. The zip itself cannot be installed, because the package is in a
-   subfolder.
-3. Open the extracted folders until you see `compute-hash`, put the cursor on
-   it and choose **Tools ▸ Advanced ▸ Install Extension…**.
-4. XeFM lists what the package adds: the `hash.compute` action and its menu
-   items. Choose **Install** (the dialog starts on Cancel). XeFM reloads its
-   configuration, and **File ▸ Compute Hash…** appears.
+**On XeFM 1.9.0**, install version 0.1.0 instead: add `@compute-hash-v0.1.0` to
+the source for the `xefm` command. 1.9.0's Install Extension takes only the
+package under the cursor, so in the app download
+[compute-hash-v0.1.0.zip](https://github.com/crftwr/xefm-extensions/archive/refs/tags/compute-hash-v0.1.0.zip),
+extract it (**File ▸ Extract Archive…**), open the extracted folder, put the
+cursor on `compute-hash` and choose **Tools ▸ Advanced ▸ Install Extension…**.
 
 It uses `ctx.run_task` with `job.item_progress`, `ctx.show_markdown`,
 `extension(__name__)` and `[contributes.menus]`, which are new in 1.9.0.

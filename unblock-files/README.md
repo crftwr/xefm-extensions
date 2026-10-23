@@ -24,11 +24,20 @@ those protections too, so unblock only files you trust.
 
 ## Install
 
-Needs XeFM 1.10.0 or later, on Windows. On XeFM 1.9.0, install version
-0.1.0 instead: add `@unblock-files-v0.1.0` to the source below, or download
-[unblock-files-v0.1.0.zip](https://github.com/crftwr/xefm-extensions/archive/refs/tags/unblock-files-v0.1.0.zip)
-in the desktop app's step 1. On macOS and Linux XeFM skips the package
-("not made for …").
+Needs XeFM 1.10.0 or later, on Windows. On macOS and Linux XeFM skips the
+package ("not made for …").
+
+**Inside XeFM** (desktop app or terminal): choose **Tools ▸ Advanced ▸ Install
+Extension…** and paste
+
+```text
+github:crftwr/xefm-extensions/unblock-files
+```
+
+XeFM downloads and checks the package and lists what it adds: the
+`unblock.files` action and its menu items. Choose **Install** (the dialog
+starts on Cancel); XeFM reloads its configuration, and **File ▸ Unblock…**
+appears.
 
 **With the `xefm` command** (pip, pipx or uv):
 
@@ -38,22 +47,12 @@ xefm ext install github:crftwr/xefm-extensions/unblock-files
 
 Then run **Tools ▸ Reload Configuration** in XeFM, or restart it.
 
-**In the desktop app** (Microsoft Store or the portable zip), which has no
-`xefm` command:
-
-1. Download
-   [main.zip](https://github.com/crftwr/xefm-extensions/archive/refs/heads/main.zip).
-   A release's tag zip, such as
-   [unblock-files-v0.2.0.zip](https://github.com/crftwr/xefm-extensions/archive/refs/tags/unblock-files-v0.2.0.zip),
-   gives that exact version.
-2. Extract it: put the cursor on the zip and choose **File ▸ Extract
-   Archive…** (XeFM extracts into the other pane's folder), or use Explorer.
-   The zip itself cannot be installed, because the package is in a subfolder.
-3. Open the extracted folders until you see `unblock-files`, put the cursor on
-   it and choose **Tools ▸ Advanced ▸ Install Extension…**.
-4. XeFM lists what the package adds: the `unblock.files` action and its menu
-   items. Choose **Install** (the dialog starts on Cancel). XeFM reloads its
-   configuration, and **File ▸ Unblock…** appears.
+**On XeFM 1.9.0**, install version 0.1.0 instead: add `@unblock-files-v0.1.0`
+to the source for the `xefm` command. 1.9.0's Install Extension takes only the
+package under the cursor, so in the app download
+[unblock-files-v0.1.0.zip](https://github.com/crftwr/xefm-extensions/archive/refs/tags/unblock-files-v0.1.0.zip),
+extract it (**File ▸ Extract Archive…**), open the extracted folder, put the
+cursor on `unblock-files` and choose **Tools ▸ Advanced ▸ Install Extension…**.
 
 ## Use
 

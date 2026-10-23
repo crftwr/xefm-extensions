@@ -83,8 +83,9 @@ committing.
   `https://github.com/crftwr/xefm-extensions/tree/main/<id>` and `updates` is
   `github:crftwr/xefm-extensions/<id>`.
 - Each package's `README.md` has what it does, a demo GIF (`docs/demo.gif`),
-  install with the `xefm` command *and* in the desktop app (see
-  `compute-hash/README.md`), and how to use it.
+  install inside XeFM (Install Extension with the `github:` source pasted)
+  *and* with the `xefm` command (see `compute-hash/README.md`), and how to use
+  it.
 - Add a row to the package table in the top-level `README.md`.
 - A workaround for an XeFM gap stays small and names the crftwr/xefm issue in
   a comment.
