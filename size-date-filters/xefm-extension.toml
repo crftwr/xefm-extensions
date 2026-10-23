@@ -1,0 +1,15 @@
+[extension]
+id = "size-date-filters"
+version = "0.1.0"
+api_version = 0
+name = "Size & Date Filters"
+description = "Pane filters for large files and recently modified files"
+min_xefm = "1.9.0"
+homepage = "https://github.com/crftwr/xefm-extensions/tree/main/size-date-filters"
+updates = "github:crftwr/xefm-extensions/size-date-filters"
+
+[contributes.filters]
+over-100mb = "size_date_filters.filters:OVER_100MB"
+over-1gb = "size_date_filters.filters:OVER_1GB"
+modified-today = "size_date_filters.filters:MODIFIED_TODAY"
+modified-7-days = "size_date_filters.filters:MODIFIED_7_DAYS"
