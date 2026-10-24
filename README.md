@@ -43,6 +43,14 @@ xefm ext install github:crftwr/xefm-extensions/<package>
 
 Then run **Tools ▸ Reload Configuration** in XeFM, or restart it.
 
+### From a downloaded zip
+
+Each release on the [Releases](https://github.com/crftwr/xefm-extensions/releases)
+page has the package as a zip, named after its tag
+(`compute-hash-v0.2.0.zip`). Download it and give its path to **Install
+Extension…** or to `xefm ext install ~/Downloads/compute-hash-v0.2.0.zip`.
+The installed copy still knows where newer versions are published.
+
 **Tools ▸ Advanced ▸ Extensions…** shows which packages loaded, and why any
 did not. Extensions run inside XeFM with your permissions, so install only
 packages you trust.
@@ -51,7 +59,9 @@ packages you trust.
 
 A release is a tag named `<id>-v<version>` (for example
 `compute-hash-v0.1.0`). Each package's manifest names this repository in
-`updates`, so an installed copy knows where its next version is.
+`updates`, so an installed copy knows where its next version is. Pushing the
+tag publishes a GitHub Release with the package attached as `<tag>.zip`
+(`.github/workflows/release.yml`).
 
 ## Writing a package
 
