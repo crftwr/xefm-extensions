@@ -43,16 +43,6 @@ xefm ext install github:crftwr/xefm-extensions/<package>
 
 Then run **Tools ▸ Reload Configuration** in XeFM, or restart it.
 
-### On XeFM 1.9.0
-
-Install a package's 0.1.0 release: add `@<package>-v0.1.0` to the source for
-the `xefm` command. 1.9.0's Install Extension takes only the package under the
-cursor, so in the desktop app download the tag's zip
-(`https://github.com/crftwr/xefm-extensions/archive/refs/tags/<package>-v0.1.0.zip`),
-extract it (**File ▸ Extract Archive…**), open the extracted folder, put the
-cursor on the package's folder and choose **Tools ▸ Advanced ▸ Install
-Extension…**.
-
 **Tools ▸ Advanced ▸ Extensions…** shows which packages loaded, and why any
 did not. Extensions run inside XeFM with your permissions, so install only
 packages you trust.

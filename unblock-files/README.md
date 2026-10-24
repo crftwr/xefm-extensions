@@ -47,13 +47,6 @@ xefm ext install github:crftwr/xefm-extensions/unblock-files
 
 Then run **Tools ▸ Reload Configuration** in XeFM, or restart it.
 
-**On XeFM 1.9.0**, install version 0.1.0 instead: add `@unblock-files-v0.1.0`
-to the source for the `xefm` command. 1.9.0's Install Extension takes only the
-package under the cursor, so in the app download
-[unblock-files-v0.1.0.zip](https://github.com/crftwr/xefm-extensions/archive/refs/tags/unblock-files-v0.1.0.zip),
-extract it (**File ▸ Extract Archive…**), open the extracted folder, put the
-cursor on `unblock-files` and choose **Tools ▸ Advanced ▸ Install Extension…**.
-
 ## Use
 
 1. Select the files (or put the cursor on one) and choose **File ▸
@@ -92,5 +85,4 @@ The tests run on any system: on macOS and Linux a path such as
 simulated by a file of that name and the same code is exercised.
 `tests/test_actions.py` needs XeFM importable.
 
-This package uses only XeFM's public API (`xefm.user_api.__all__`), much of
-which is still Preview (`API_VERSION` 0) and may change.
+This package uses only XeFM's public API (`xefm.user_api.__all__`).

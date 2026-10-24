@@ -28,13 +28,6 @@ xefm ext install github:crftwr/xefm-extensions/s3-share
 
 Then run **Tools ▸ Reload Configuration** in XeFM, or restart it.
 
-**On XeFM 1.9.0**, install version 0.1.0 instead: add `@s3-share-v0.1.0` to the
-source for the `xefm` command. 1.9.0's Install Extension takes only the package
-under the cursor, so in the app download
-[s3-share-v0.1.0.zip](https://github.com/crftwr/xefm-extensions/archive/refs/tags/s3-share-v0.1.0.zip),
-extract it (**File ▸ Extract Archive…**), open the extracted folder, put the
-cursor on `s3-share` and choose **Tools ▸ Advanced ▸ Install Extension…**.
-
 It uses boto3, which XeFM already includes for its S3 support.
 
 ## Use
@@ -83,5 +76,4 @@ cd s3-share && python -m pytest tests
 importable; `tests/test_boto3.py` signs with the real boto3 and fake
 credentials (no AWS account or network needed).
 
-This package uses only XeFM's public API (`xefm.user_api.__all__`), much of
-which is still Preview (`API_VERSION` 0) and may change.
+This package uses only XeFM's public API (`xefm.user_api.__all__`).

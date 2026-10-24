@@ -37,15 +37,6 @@ xefm ext install github:crftwr/xefm-extensions/size-date-filters
 
 Then run **Tools ▸ Reload Configuration** in XeFM, or restart it.
 
-**On XeFM 1.9.0**, install version 0.1.0 instead: add
-`@size-date-filters-v0.1.0` to the source for the `xefm` command. 1.9.0's
-Install Extension takes only the package under the cursor, so in the app
-download
-[size-date-filters-v0.1.0.zip](https://github.com/crftwr/xefm-extensions/archive/refs/tags/size-date-filters-v0.1.0.zip),
-extract it (**File ▸ Extract Archive…**), open the extracted folder, put the
-cursor on `size-date-filters` and choose **Tools ▸ Advanced ▸ Install
-Extension…**.
-
 ## Use
 
 Open the Filter dialog (`;` in the AFX keymap, or **View ▸ Filter…**). The four
@@ -67,4 +58,4 @@ cd size-date-filters && python -m pytest tests
 ```
 
 The tests do not need XeFM. The package has no actions and imports nothing
-from XeFM. `FILTERS` is still Preview (`API_VERSION` 0) and may change.
+from XeFM.
