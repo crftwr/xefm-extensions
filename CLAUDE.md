@@ -159,5 +159,9 @@ Things that cost retries:
   to this repository.
 - Release a package by tagging `<id>-v<version>` once the XeFM version in its
   `min_xefm` is out. Bump `version` in the manifest for each release.
+  Pushing the tag runs `.github/workflows/release.yml`, which creates the
+  tag's GitHub Release with the package folder attached as `<tag>.zip`. XeFM
+  downloads that instead of the whole repository. For a tag pushed before
+  the workflow existed, run it by hand with the tag.
 - When a package needs something XeFM lacks, or XeFM misbehaves, file an
   issue on crftwr/xefm with a reproduction.

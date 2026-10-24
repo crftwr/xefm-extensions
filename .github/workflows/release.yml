@@ -1,0 +1,47 @@
+# A package tag (<id>-v<version>) gets a GitHub Release with the package
+# folder attached as <tag>.zip. XeFM downloads that asset instead of the whole
+# repository (crftwr/xefm), and anyone can download the package from it.
+# Run it by hand with a tag to attach the asset to a tag pushed before this.
+name: Release package
+
+on:
+  push:
+    tags: ["*-v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Package tag, e.g. compute-hash-v0.2.0"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ inputs.tag || github.ref_name }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ inputs.tag || github.ref_name }}
+
+      - name: Zip the package folder
+        run: |
+          id="${TAG%-v*}"
+          test -f "$id/xefm-extension.toml" || { echo "no package $id/ at $TAG"; exit 1; }
+          # git archive honours .gitattributes (export-ignore), like GitHub's
+          # own source zips.
+          git archive --format=zip -o "$TAG.zip" "$TAG" "$id"
+          echo "PKG=$id" >> "$GITHUB_ENV"
+
+      - name: Attach it to the tag's release
+        run: |
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            gh release upload "$TAG" "$TAG.zip" --clobber
+          else
+            gh release create "$TAG" "$TAG.zip" --verify-tag \
+              --title "$PKG ${TAG##*-v}" \
+              --notes "Install in XeFM with \`github:${{ github.repository }}/$PKG@$TAG\`. Usage: [$PKG/README.md](https://github.com/${{ github.repository }}/blob/$TAG/$PKG/README.md)."
+          fi
