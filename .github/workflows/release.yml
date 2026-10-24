@@ -38,12 +38,13 @@ jobs:
 
       - name: Attach it to the tag's release
         run: |
-          # --latest=false: in a repository of packages, the release made last
-          # is no more the "Latest" than any other package's.
+          # "Latest" moves to the package released last. A hand run attaches
+          # the asset to an older tag, which should not take it.
+          if [ "${{ github.event_name }}" = workflow_dispatch ]; then latest=false; else latest=true; fi
           if gh release view "$TAG" > /dev/null 2>&1; then
             gh release upload "$TAG" "$TAG.zip" --clobber
           else
-            gh release create "$TAG" "$TAG.zip" --verify-tag --latest=false \
+            gh release create "$TAG" "$TAG.zip" --verify-tag --latest=$latest \
               --title "$PKG ${TAG##*-v}" \
               --notes "Install in XeFM with \`github:${{ github.repository }}/$PKG@$TAG\`. Usage: [$PKG/README.md](https://github.com/${{ github.repository }}/blob/$TAG/$PKG/README.md)."
           fi
