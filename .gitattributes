@@ -1,3 +1,5 @@
-# Keep demo animations out of the source zip that `xefm ext install` downloads;
-# the READMEs still show them from the repository.
+# Keep demo animations and README images out of the zips XeFM downloads (the
+# repository zip, and the release asset of a package tag); the READMEs still
+# show them from the repository.
 *.gif export-ignore
+*/docs export-ignore
