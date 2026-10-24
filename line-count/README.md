@@ -41,13 +41,6 @@ xefm ext install github:crftwr/xefm-extensions/line-count
 
 Then run **Tools ▸ Reload Configuration** in XeFM, or restart it.
 
-**On XeFM 1.9.0**, install version 0.1.0 instead: add `@line-count-v0.1.0` to
-the source for the `xefm` command. 1.9.0's Install Extension takes only the
-package under the cursor, so in the app download
-[line-count-v0.1.0.zip](https://github.com/crftwr/xefm-extensions/archive/refs/tags/line-count-v0.1.0.zip),
-extract it (**File ▸ Extract Archive…**), open the extracted folder, put the
-cursor on `line-count` and choose **Tools ▸ Advanced ▸ Install Extension…**.
-
 ## Use
 
 **File ▸ Count Lines…**, the row's context menu, or the command palette
@@ -88,5 +81,4 @@ cd line-count && python -m pytest tests
 
 `tests/test_actions.py` needs XeFM importable; `tests/test_logic.py` does not.
 
-This package uses only XeFM's public API (`xefm.user_api.__all__`), much of
-which is still Preview (`API_VERSION` 0) and may change.
+This package uses only XeFM's public API (`xefm.user_api.__all__`).

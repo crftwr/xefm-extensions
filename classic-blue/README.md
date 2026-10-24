@@ -42,13 +42,6 @@ xefm ext install github:crftwr/xefm-extensions/classic-blue
 Then **restart XeFM**. Tools ▸ Reload Configuration does not add a newly
 installed theme to the list yet (crftwr/xefm#708).
 
-**On XeFM 1.9.0**, install version 0.1.0 instead: add `@classic-blue-v0.1.0` to
-the source for the `xefm` command. 1.9.0's Install Extension takes only the
-package under the cursor, so in the app download
-[classic-blue-v0.1.0.zip](https://github.com/crftwr/xefm-extensions/archive/refs/tags/classic-blue-v0.1.0.zip),
-extract it (**File ▸ Extract Archive…**), open the extracted folder, put the
-cursor on `classic-blue` and choose **Tools ▸ Advanced ▸ Install Extension…**.
-
 ## Use
 
 Pick **Classic Blue** in **View ▸ Theme**, or cycle to it with the
@@ -70,5 +63,4 @@ that text on the blue meets WCAG contrast (4.5:1).
 
 The theme is a Python dict ([`theme.py`](classic_blue/theme.py)) rather than
 a table in the manifest, because colors written in TOML arrive as lists and
-crash XeFM when the theme is selected (crftwr/xefm#708). `THEMES` is still
-Preview (`API_VERSION` 0) and may change.
+crash XeFM when the theme is selected (crftwr/xefm#708).

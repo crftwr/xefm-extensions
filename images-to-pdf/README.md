@@ -28,13 +28,6 @@ xefm ext install github:crftwr/xefm-extensions/images-to-pdf
 
 Then run **Tools ▸ Reload Configuration** in XeFM, or restart it.
 
-**On XeFM 1.9.0**, install version 0.1.0 instead: add `@images-to-pdf-v0.1.0`
-to the source for the `xefm` command. 1.9.0's Install Extension takes only the
-package under the cursor, so in the app download
-[images-to-pdf-v0.1.0.zip](https://github.com/crftwr/xefm-extensions/archive/refs/tags/images-to-pdf-v0.1.0.zip),
-extract it (**File ▸ Extract Archive…**), open the extracted folder, put the
-cursor on `images-to-pdf` and choose **Tools ▸ Advanced ▸ Install Extension…**.
-
 It uses Pillow, which XeFM already includes, so there is nothing else to
 install.
 
@@ -78,5 +71,4 @@ cd images-to-pdf && python -m pytest tests
 
 The tests need Pillow; `tests/test_actions.py` also needs XeFM importable.
 
-This package uses only XeFM's public API (`xefm.user_api.__all__`), much of
-which is still Preview (`API_VERSION` 0) and may change.
+This package uses only XeFM's public API (`xefm.user_api.__all__`).
