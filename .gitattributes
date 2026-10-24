@@ -1,0 +1,3 @@
+# Keep demo animations out of the source zip that `xefm ext install` downloads;
+# the READMEs still show them from the repository.
+*.gif export-ignore
