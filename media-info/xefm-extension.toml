@@ -1,0 +1,92 @@
+[extension]
+id = "media-info"
+version = "0.1.0"
+api_version = 1
+name = "Media Info"
+description = "Photo EXIF, audio tags and video streams as attributes: in File Details, as columns, to sort by"
+min_xefm = "1.12.0"
+homepage = "https://github.com/crftwr/xefm-extensions/tree/main/media-info"
+updates = "github:crftwr/xefm-extensions/media-info"
+
+# One attribute per field. A file is read once for all of them (media_info.read
+# keeps the results), and only on the local disk.
+[contributes.attributes."media.dimensions"]
+label = "Dimensions"
+read = "media_info.attrs:dimensions"
+
+[contributes.attributes."media.date"]
+label = "Date taken"
+type = "time"
+read = "media_info.attrs:date"
+
+[contributes.attributes."media.camera"]
+label = "Camera"
+read = "media_info.attrs:camera"
+
+[contributes.attributes."media.lens"]
+label = "Lens"
+read = "media_info.attrs:lens"
+
+[contributes.attributes."media.exposure"]
+label = "Exposure"
+read = "media_info.attrs:exposure"
+
+[contributes.attributes."media.location"]
+label = "Location"
+read = "media_info.attrs:location"
+
+[contributes.attributes."media.duration"]
+label = "Duration"
+type = "duration"
+read = "media_info.attrs:duration"
+
+[contributes.attributes."media.title"]
+label = "Title"
+read = "media_info.attrs:title"
+
+[contributes.attributes."media.artist"]
+label = "Artist"
+read = "media_info.attrs:artist"
+
+[contributes.attributes."media.album"]
+label = "Album"
+read = "media_info.attrs:album"
+
+[contributes.attributes."media.year"]
+label = "Year"
+read = "media_info.attrs:year"
+
+[contributes.attributes."media.track"]
+label = "Track"
+read = "media_info.attrs:track"
+
+[contributes.attributes."media.genre"]
+label = "Genre"
+read = "media_info.attrs:genre"
+
+[contributes.attributes."media.bitrate"]
+label = "Bit rate"
+read = "media_info.attrs:bitrate"
+
+[contributes.attributes."media.video"]
+label = "Video"
+read = "media_info.attrs:video"
+
+[contributes.attributes."media.audio"]
+label = "Audio"
+read = "media_info.attrs:audio"
+
+# In a folder that is mostly media, a Duration and a Dimensions column beside
+# the size. View > Show turns it on or off per tab. Their priorities are below
+# the date's (1), so a narrow pane gives them up before it.
+[contributes.layout_extras.media]
+label = "Media"
+when = "media_info.attrs:media_folder"
+columns = [
+    { attr = "media.duration", after = "size", priority = 0 },
+    { attr = "media.dimensions", after = "size", width = 11, priority = -1 },
+]
+
+[requires]
+host_packages = ["PIL"]
+python_packages = ["pymediainfo>=6"]

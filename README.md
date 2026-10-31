@@ -9,6 +9,7 @@ manager. Each folder is one package with its own `xefm-extension.toml`.
 | [compute-hash](compute-hash/) | MD5 / SHA-1 / SHA-256 / SHA-512 / BLAKE2b digests of the selected files |
 | [images-to-pdf](images-to-pdf/) | Combine the selected images into one PDF |
 | [line-count](line-count/) | Lines, words and characters of the selected files and folders |
+| [media-info](media-info/) | Photo EXIF, audio tags and video streams in File Details, as columns and to sort by |
 | [s3-share](s3-share/) | Copy a time-limited HTTPS link (presigned URL) to an S3 object |
 | [size-date-filters](size-date-filters/) | Pane filters for large files and recently modified files |
 | [unblock-files](unblock-files/) | Remove the Mark of the Web from downloaded files (Windows) |
