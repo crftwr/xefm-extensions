@@ -5,14 +5,7 @@ videos say about themselves — a photo's camera and exposure, a song's artist
 and length, a video's resolution and codecs — as XeFM attributes. They show in
 **File Details**, as columns in a folder of media, and you can sort by them.
 
-```
-| Dimensions | 6000 × 4000 |
-| Date taken | 2024-05-01 09:10:11 |
-| Camera     | FUJIFILM X100V |
-| Lens       | XF23mmF2 R WR |
-| Exposure   | 1/250 s · f/2 · ISO 200 · 23 mm |
-| Location   | 35.65858° N, 139.74543° E |
-```
+![Media Info in XeFM's terminal UI: a Duration column in a folder of media, then File Details for a photo, a video and a song](docs/demo.gif)
 
 ## Install
 
