@@ -1,0 +1,55 @@
+[extension]
+id = "git"
+version = "0.1.0"
+api_version = 1
+name = "Git"
+description = "Git status beside each name, the changed files as one list, any revision as a read-only folder, and diffs against it"
+min_xefm = "1.12.0"
+homepage = "https://github.com/crftwr/xefm-extensions/tree/main/git"
+updates = "github:crftwr/xefm-extensions/git"
+
+# One `git status` per folder answers every row. A folder gets the most
+# important status of the changes inside it.
+[contributes.attributes."git.status"]
+label = "Git status"
+type = "enum"
+read = "xefm_git.attrs:status"
+
+[contributes.attributes."git.status".values]
+U = { label = "Conflicted", color = "orange" }
+M = { label = "Modified", color = "yellow" }
+D = { label = "Deleted", color = "red" }
+R = { label = "Renamed", color = "blue" }
+A = { label = "Added", color = "green" }
+"?" = { label = "Untracked", color = "muted" }
+
+# In a working tree, the status letter before the name. View > Show turns it
+# on or off per tab.
+[contributes.layout_extras.git]
+label = "Git status"
+when = "xefm_git.attrs:in_work_tree"
+markers = [{ attr = "git.status", format = "xefm_git.attrs:mark", on = "name", side = "before" }]
+
+# A revision as a folder: git://<repository>#<revision>:<path>
+[contributes.path_schemes]
+git = "xefm_git.tree:GitPathImpl"
+
+[contributes.actions]
+"git.changed" = { entry = "xefm_git.actions:changed", description = "Git: list every changed file of the repository" }
+"git.browse" = { entry = "xefm_git.actions:browse", description = "Git: open a revision as a read-only folder" }
+"git.diff_head" = { entry = "xefm_git.actions:diff_head", description = "Git: compare the file with its HEAD version" }
+"git.log" = { entry = "xefm_git.actions:log", description = "Git: the commits that changed the file" }
+"git.open_tool" = { entry = "xefm_git.actions:open_tool", description = "Git: start your Git tool in the repository" }
+
+[contributes.menus]
+"git.changed" = { menus = ["file"], label = "Git: Changed Files" }
+"git.browse" = { menus = ["file"], label = "Git: Browse Revision…" }
+"git.diff_head" = { menus = ["file", "context"], label = "Git: Compare with HEAD", when = "entry" }
+"git.log" = { menus = ["file", "context"], label = "Git: File History…", when = "entry" }
+"git.open_tool" = { menus = ["file"], label = "Git: Open Git Tool" }
+
+[settings]
+defaults = "xefm_git.settings:Settings"
+
+[requires]
+programs = ["git"]
