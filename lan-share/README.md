@@ -5,6 +5,8 @@ on the local network. XeFM shows a link and a QR code; a phone or any other
 device on the same network opens it in a browser and downloads the files.
 Nothing is installed on the other device.
 
+![LAN Share in XeFM's terminal UI: four files selected, Share on Local Network in the context menu, the dialog with the link and a QR code, and sharing stopped when it closes](docs/demo.gif)
+
 - Files download, or play in the browser: videos seek, because the server
   answers range requests.
 - Folders can be browsed page by page, or downloaded as a ZIP built while it
@@ -45,7 +47,7 @@ Then run **Tools ▸ Reload Configuration** in XeFM, or restart it.
 palette (`lan-share.share`).
 
 1. Select the files and folders to share, or put the cursor on one.
-2. Choose **Share on Local Network…**. A dialog shows a QR code and the link.
+2. Choose **Share on Local Network…**. A dialog shows the link and a QR code.
    The link's **Copy** button copies it, to send to a computer.
 3. Scan the code with the phone's camera, or open the link in any browser on
    the same network. The page lists what you shared: tap a name to open it,

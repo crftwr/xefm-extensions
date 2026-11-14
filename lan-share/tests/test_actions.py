@@ -95,6 +95,7 @@ def test_shares_the_selection_and_stops_on_close(handle, files):
     url = url_of(source)
     assert url.startswith("http://127.0.0.1:")
     assert f"```\n{url}\n```" in source        # in a code block: a Copy button
+    assert source.index(url) < source.index("![QR code]")   # never scrolled away
     assert "a.txt, pics/" in source
     assert "30 minutes without a request" in source
     status, page = fetch(url)

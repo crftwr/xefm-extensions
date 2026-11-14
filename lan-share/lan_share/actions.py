@@ -196,8 +196,8 @@ def write_png(data, folders):
 
 
 def dialog_markdown(url, code, names, *, idle_minutes, remote_host=None):
-    """The dialog's Markdown: what to do, the QR code, the link in a code
-    block (its Copy button copies it), what is shared, and what the reader
+    """The dialog's Markdown: what to do, the link in a code block (its Copy
+    button copies it), the QR code, what is shared, and what the reader
     should know before leaving it open."""
     shown = ", ".join(md_escape(name) for name in names[:SHOWN_NAMES])
     if len(names) > SHOWN_NAMES:
@@ -218,11 +218,13 @@ def dialog_markdown(url, code, names, *, idle_minutes, remote_host=None):
         notes.insert(0, f"XeFM is running on **{md_escape(remote_host)}** over SSH: "
                         "the link is on that machine's network, which may not "
                         "be the one this screen is on.")
-    parts = ["Scan the code with a phone, or open the link on any device on "
-             "this network."]
+    # The link before the code: in a short terminal the code fills the
+    # dialog, and the link must not be the part scrolled out of sight. It is
+    # also the first Copy button Tab reaches.
+    parts = ["Open the link on any device on this network, or scan the code "
+             "with a phone.", md_code_block(url)]
     if code:
         parts.append(code)
-    parts.append(md_code_block(url))
     parts.append(f"**Sharing:** {shown}")
     parts.append("\n".join(f"- {note}" for note in notes))
     return "\n\n".join(parts)
