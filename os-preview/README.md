@@ -8,8 +8,9 @@ XeFM's own viewers do not.
 
 ![OS Preview in XeFM's desktop app: a video, a Word document, then a selection stepped through with the arrow keys](docs/demo.gif)
 
-macOS only for now. Windows has no built-in preview of this kind, and support
-for the third-party ones (QuickLook, PowerToys Peek) is planned
+macOS only for now. **Windows: coming soon.** Windows has no built-in preview
+of this kind, so it will use a third-party one (QuickLook or PowerToys Peek)
+when installed
 ([crftwr/xefm discussion #891](https://github.com/crftwr/xefm/discussions/891)).
 
 ## Install
