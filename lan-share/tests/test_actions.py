@@ -21,8 +21,9 @@ def entry(path, name=None):
 
 
 class FakeCtx:
-    def __init__(self, selected=(), focused=None, terminal=False):
-        self.pane = SimpleNamespace(selected=lambda: list(selected), focused=focused)
+    def __init__(self, selected=(), focused=None, terminal=False, path=None):
+        self.pane = SimpleNamespace(selected=lambda: list(selected), focused=focused,
+                                    path=path)
         self.is_terminal_backend = terminal
         self.messages, self.shown, self.choices = [], [], []
 
@@ -239,3 +240,86 @@ def test_dialog_markdown_shortens_a_long_list_and_escapes_names():
     assert r"a\_b\*.txt" in source
     assert "and 2 more" in source
     assert "after 1 minute without" in source
+
+
+# --- receive ----------------------------------------------------------------- #
+
+def post(url, name, data):
+    host, port, path = re.match(r"http://([0-9.]+):(\d+)(/.*)", url).groups()
+    connection = http.client.HTTPConnection(host, int(port), timeout=5)
+    try:
+        connection.request("POST", f"{path}upload?name={name}", body=data)
+        response = connection.getresponse()
+        return response.status, response.read()
+    finally:
+        connection.close()
+
+
+def test_receive_saves_into_the_pane_folder_and_reports_on_close(handle, files):
+    ctx = FakeCtx(path=files)
+    actions.receive(ctx)
+    [(title, source, on_close)] = ctx.shown
+    assert title == actions.RECEIVE_TITLE
+    url = url_of(source)
+    assert source.index(url) < source.index("![QR code]")
+    assert "**Saving into:**" in source
+    assert "never replaces" in source
+    status, page = fetch(url)
+    assert status == 200 and b'type="file"' in page
+    assert post(url, "a.txt", b"new")[0] == 201          # a.txt is taken
+    assert (files / "a.txt").read_bytes() == b"alpha\n"
+    assert (files / "a (1).txt").read_bytes() == b"new"
+    [server] = actions.running_servers()
+    on_close()
+    assert _wait_stopped(server)
+    assert ctx.messages[-2:] == [
+        f"{actions.RECEIVE_TITLE}: received a (1).txt (3 bytes)",
+        f"{actions.RECEIVE_TITLE}: stopped, 1 file received"]
+
+
+def test_receive_lists_at_most_twenty_names(handle, files):
+    ctx = FakeCtx(path=files)
+    actions.receive(ctx)
+    url = url_of(ctx.shown[0][1])
+    for i in range(23):
+        assert post(url, f"f{i}.txt", b"x")[0] == 201
+    ctx.shown[0][2]()
+    names = [m for m in ctx.messages if ": received " in m]
+    assert len(names) == actions.SHOWN_RECEIVED
+    assert ctx.messages[-2:] == [f"{actions.RECEIVE_TITLE}: and 3 more",
+                                 f"{actions.RECEIVE_TITLE}: stopped, 23 files received"]
+
+
+def test_receive_shares_nothing_for_download(handle, files):
+    ctx = FakeCtx(path=files)
+    actions.receive(ctx)
+    url = url_of(ctx.shown[0][1])
+    assert fetch(url + "f/0/a.txt")[0] == 404
+    assert b"a.txt" not in fetch(url)[1]
+
+
+def test_receive_refuses_a_folder_not_on_this_computer(handle):
+    class Remote:
+        def __str__(self):
+            return "ssh://host/home/me"
+
+    ctx = FakeCtx(path=Remote())
+    actions.receive(ctx)
+    assert ctx.shown == []
+    assert "only be received into a folder on this computer" in ctx.messages[-1]
+    assert actions.running_servers() == []
+
+
+def test_receive_refuses_a_folder_it_cannot_write(handle, files, monkeypatch):
+    monkeypatch.setattr(actions.os, "access", lambda path, mode: False)
+    ctx = FakeCtx(path=files)
+    actions.receive(ctx)
+    assert ctx.shown == []
+    assert ctx.messages[-1] == f"{actions.RECEIVE_TITLE}: cannot write to {files}"
+
+
+def test_receive_markdown():
+    source = actions.receive_markdown("http://10.0.0.2:1/t/", "", "/home/me/in_box",
+                                      idle_minutes=0)
+    assert r"/home/me/in\_box" in source
+    assert "Receiving stops when this dialog is closed (Esc or Enter)." in source

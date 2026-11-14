@@ -8,7 +8,8 @@ import ipaddress
 import mimetypes
 import secrets
 import socket
-from urllib.parse import quote, unquote, urlsplit
+import unicodedata
+from urllib.parse import parse_qs, quote, unquote, urlsplit
 
 
 # --------------------------------------------------------------------------- #
@@ -83,15 +84,19 @@ def share_url(address, port, token):
 
 class Route:
     """What a request path asks for. ``kind`` is ``"index"`` (the page of the
-    shared items) or ``"item"`` (``index`` into the shared items, then
-    ``segments`` below it); ``zip`` and ``download`` are the query flags."""
+    shared items), ``"item"`` (``index`` into the shared items, then
+    ``segments`` below it) or ``"upload"`` (a file sent to a receiving share);
+    ``zip`` and ``download`` are the query flags, ``params`` every query
+    value (the last one of each name)."""
 
-    def __init__(self, kind, index=None, segments=(), *, zip=False, download=False):
+    def __init__(self, kind, index=None, segments=(), *, zip=False, download=False,
+                 params=None):
         self.kind = kind
         self.index = index
         self.segments = list(segments)
         self.zip = zip
         self.download = download
+        self.params = dict(params or {})
 
 
 def parse_route(target, token):
@@ -105,13 +110,17 @@ def parse_route(target, token):
     given = unquote(segments[1])
     if not hmac.compare_digest(given.encode(), token.encode()):
         return None
-    flags = {flag.split("=")[0] for flag in parts.query.split("&") if flag}
-    options = {"zip": "zip" in flags, "download": "dl" in flags}
+    params = {name: values[-1] for name, values
+              in parse_qs(parts.query, keep_blank_values=True).items()}
+    options = {"zip": "zip" in params, "download": "dl" in params,
+               "params": params}
     rest = [unquote(s) for s in segments[2:]]
     if rest and rest[-1] == "":
         rest.pop()                              # a trailing slash
     if not rest:
         return Route("index", **options)
+    if rest == ["upload"]:
+        return Route("upload", **options)
     # /<token>/f/<index>/<name>/<below>...: the name is there for the browser
     # (what it calls a saved file); the index is what selects the item.
     if rest[0] != "f" or len(rest) < 3 or not rest[1].isdigit():
@@ -128,6 +137,73 @@ def safe_segment(name, *, include_hidden=True):
     if name in ("", ".", "..") or "/" in name or "\\" in name or "\0" in name:
         return False
     return include_hidden or not name.startswith(".")
+
+
+# --------------------------------------------------------------------------- #
+# Uploads
+# --------------------------------------------------------------------------- #
+
+_NOT_IN_NAMES = set('<>:"/\\|?*')
+_RESERVED = {"CON", "PRN", "AUX", "NUL", *(f"COM{i}" for i in range(1, 10)),
+             *(f"LPT{i}" for i in range(1, 10))}
+MAX_NAME_BYTES = 255
+
+
+def upload_name(name):
+    """The name a sent file is saved under, or None when nothing is left of
+    it. What a browser sends is only a suggestion: any folder part goes, the
+    characters Windows refuses (and control characters) become ``_``, and so
+    does a leading dot - a sender must not be able to drop a ``.zshrc`` or a
+    ``.git`` into the folder. Reserved Windows device names get a ``_`` in
+    front, and the name is kept within 255 bytes, its extension intact. The
+    rules are the same on every OS, so a file can move on unchanged."""
+    name = unicodedata.normalize("NFC", str(name or ""))
+    name = name.replace("\\", "/").rsplit("/", 1)[-1]
+    name = "".join("_" if ord(c) < 32 or ord(c) == 127 or c in _NOT_IN_NAMES else c
+                   for c in name)
+    name = name.strip().rstrip(". ")
+    if not name or set(name) <= {"."}:
+        return None
+    if name.startswith("."):
+        name = "_" + name[1:]
+    stem, dot, suffix = name.rpartition(".")
+    if not dot:
+        stem, suffix = name, ""
+    if stem.split(".")[0].upper() in _RESERVED:
+        name = "_" + name
+        stem = "_" + stem
+    if len(name.encode("utf-8")) > MAX_NAME_BYTES:
+        tail = (dot + suffix) if dot and len((dot + suffix).encode("utf-8")) <= 32 else ""
+        room = MAX_NAME_BYTES - len(tail.encode("utf-8"))
+        head = (stem if tail else name).encode("utf-8")[:room].decode("utf-8", "ignore")
+        name = head.rstrip(". ") + tail
+    return name
+
+
+def candidate_names(name, limit=10000):
+    """``name``, then ``stem (1).ext``, ``stem (2).ext`` ...: what to try
+    until one is free. The number goes before the last extension, or before
+    ``.tar.gz`` and the like."""
+    yield name
+    stem, dot, suffix = name.rpartition(".")
+    if not dot or not stem:
+        stem, dot, suffix = name, "", ""
+    elif stem.lower().endswith(".tar") and len(stem) > 4:
+        stem, suffix = stem[:-4], "tar." + suffix
+    for n in range(1, limit):
+        yield f"{stem} ({n}){dot}{suffix}"
+
+
+def upload_mtime(value):
+    """The file time a browser sent (``File.lastModified``, milliseconds), in
+    seconds; None when it is missing or not plausible."""
+    try:
+        millis = int(value)
+    except (TypeError, ValueError):
+        return None
+    if not 0 < millis < 2 ** 41:                # up to the year 2039 and well past
+        return None
+    return millis / 1000
 
 
 def parse_range(header, size):
@@ -219,20 +295,68 @@ a.get {{ border: 1px solid currentColor; border-radius: .4rem;
         white-space: nowrap; }}
 p.all {{ margin: 1rem 0; }}
 p.note {{ opacity: .65; font-size: .85rem; margin-top: 1.5rem; }}
+label.pick {{ display: inline-block; border-radius: .5rem; padding: .7rem 1.2rem;
+             background: #2a6fdb; color: #fff; font-weight: 600; cursor: pointer; }}
+li progress {{ width: 6rem; }}
 </style></head><body>
 <h1>{heading}</h1>
-{all}<ul>
-{rows}</ul>
-<p class="note">Shared with XeFM. The link stops working when the share ends.</p>
+{upload}{all}{listing}
+<p class="note">{note}</p>
 </body></html>
 """
 
+# The upload half of a receiving share's page. Files go one at a time, each
+# as the body of its own POST (no multipart to parse on the server), with the
+# name and time in the query. Names are put on the page with textContent.
+_UPLOAD = """<p>Files you send are saved in <b>{folder}</b> on the computer.
+A file never replaces one already there: it gets a new name instead.</p>
+<p><label class="pick">Choose files to send<input id="pick" type="file" multiple hidden></label></p>
+<ul id="sent"></ul>
+<script>
+const pick = document.getElementById("pick"), sent = document.getElementById("sent");
+pick.addEventListener("change", async () => {
+  const files = Array.from(pick.files);
+  pick.value = "";
+  for (const file of files) await send(file);
+});
+function send(file) {
+  return new Promise(done => {
+    const row = document.createElement("li"), name = document.createElement("span");
+    const bar = document.createElement("progress"), state = document.createElement("span");
+    name.className = "name"; name.style.flex = "1"; name.style.opacity = "1";
+    name.style.whiteSpace = "normal"; name.style.wordBreak = "break-all";
+    name.textContent = file.name; bar.max = 1; bar.value = 0;
+    row.append(name, bar, state); sent.prepend(row);
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", "upload?name=" + encodeURIComponent(file.name) +
+             "&mtime=" + encodeURIComponent(file.lastModified || ""));
+    xhr.upload.onprogress = e => { if (e.lengthComputable) bar.value = e.loaded / e.total; };
+    xhr.onload = () => {
+      bar.remove();
+      if (xhr.status === 201) {
+        const saved = JSON.parse(xhr.responseText).name;
+        state.textContent = saved === file.name ? "Saved" : "Saved as " + saved;
+      } else {
+        state.textContent = "Not saved: " + xhr.responseText.trim();
+      }
+      done();
+    };
+    xhr.onerror = () => { bar.remove(); state.textContent = "Not saved: the connection was lost"; done(); };
+    xhr.send(file);
+  });
+}
+</script>
+"""
 
-def render_page(title, crumbs, rows, *, zip_href=None, zip_label="Download all as ZIP"):
+
+def render_page(title, crumbs, rows, *, zip_href=None, zip_label="Download all as ZIP",
+                upload_folder=None):
     """The HTML of one listing. ``crumbs`` is ``[(label, href or None)]``, the
     way down to this folder; ``rows`` is ``[(name, href, is_dir, size,
     get_href)]``, where ``get_href`` downloads the row (a folder as ZIP).
-    Every name is escaped here: a file may be called anything."""
+    ``upload_folder`` names the folder a receiving share saves into: the page
+    then offers to send files, and lists nothing when there is nothing to
+    download. Every name is escaped here: a file may be called anything."""
     heading = " / ".join(
         f'<a href="{html.escape(href, quote=True)}">{html.escape(label)}</a>'
         if href else html.escape(label)
@@ -246,12 +370,19 @@ def render_page(title, crumbs, rows, *, zip_href=None, zip_label="Download all a
             f'<li><a class="name" href="{html.escape(href, quote=True)}">{label}</a>'
             f'<span>{detail}</span>'
             f'<a class="get" href="{html.escape(get_href, quote=True)}">{get}</a></li>\n')
-    if not lines:
+    upload = ""
+    if upload_folder is not None:
+        # replace, not format: the script is full of braces
+        upload = _UPLOAD.replace("{folder}", html.escape(upload_folder))
+    if not lines and upload_folder is None:
         lines.append("<li><span>Nothing here.</span></li>\n")
+    listing = f"<ul>\n{''.join(lines)}</ul>" if lines else ""
     all_link = ""
     if zip_href:
         all_link = (f'<p class="all"><a class="get" href="'
                     f'{html.escape(zip_href, quote=True)}">'
                     f'{html.escape(zip_label)}</a></p>\n')
-    return _PAGE.format(title=html.escape(title), heading=heading,
-                        all=all_link, rows="".join(lines))
+    note = ("Received with XeFM." if upload_folder is not None and not rows
+            else "Shared with XeFM.") + " The link stops working when the share ends."
+    return _PAGE.format(title=html.escape(title), heading=heading, upload=upload,
+                        all=all_link, listing=listing, note=note)

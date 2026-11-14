@@ -72,10 +72,15 @@ def test_nothing_is_served_without_the_token(share):
         assert b"alpha" not in body
 
 
-def test_other_methods_are_refused(share):
-    for method in ("POST", "PUT", "DELETE"):
+def test_other_methods_are_refused(share, tree):
+    for method in ("PUT", "DELETE"):
         status, _, _ = get(share, f"/{TOKEN}/f/1/movie.mp4", method=method)
         assert status == 501, method
+    # a share that only gives takes nothing, under any path
+    for target in (f"/{TOKEN}/upload?name=x.txt", f"/{TOKEN}/f/0/docs/x.txt"):
+        status, _, _ = get(share, target, method="POST")
+        assert status == 404, target
+    assert not list(tree.rglob("x.txt"))
 
 
 # --- pages ------------------------------------------------------------------- #

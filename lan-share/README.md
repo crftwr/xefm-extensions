@@ -1,9 +1,10 @@
 # LAN Share
 
 An [XeFM](https://github.com/crftwr/xefm) extension: share the selected files
-on the local network. XeFM shows a link and a QR code; a phone or any other
-device on the same network opens it in a browser and downloads the files.
-Nothing is installed on the other device.
+on the local network, or receive files into a folder. XeFM shows a link and a
+QR code; a phone or any other device on the same network opens it in a
+browser and downloads the files, or sends its own. Nothing is installed on the
+other device.
 
 ![LAN Share in XeFM's terminal UI: four files selected, Share on Local Network in the context menu, the dialog with the link and a QR code, and sharing stopped when it closes](docs/demo.gif)
 
@@ -14,6 +15,8 @@ Nothing is installed on the other device.
 - Anything XeFM can open can be shared: a file on `ssh://` or `s3://`, or one
   inside an archive, goes to the phone straight from where it is, without
   being copied to this machine first.
+- **Receiving** saves what a phone or tablet sends into the current folder,
+  and never replaces a file that is already there.
 - Sharing stops when you close the dialog.
 
 ## Install
@@ -29,7 +32,7 @@ github:crftwr/xefm-extensions/lan-share
 ```
 
 XeFM downloads and checks the package and lists what it adds: the
-`lan-share.share` action and its menu items. Choose **Install** (the dialog
+`lan-share.share` and `lan-share.receive` actions and their menu items. Choose **Install** (the dialog
 starts on Cancel); XeFM reloads its configuration, and **File ▸ Share on Local
 Network…** appears.
 
@@ -55,6 +58,27 @@ palette (`lan-share.share`).
 4. Close the dialog (`Esc` or `Enter`) to stop sharing. Sharing also stops by
    itself after 30 minutes without a request.
 
+### Receiving files
+
+**File ▸ Receive Files on Local Network…**, or the command palette
+(`lan-share.receive`).
+
+1. Go to the folder the files should land in.
+2. Choose **Receive Files on Local Network…**. The dialog shows a link and a
+   QR code, as for sharing.
+3. On the phone or tablet, open the link and tap **Choose files to send**:
+   photos from the library, or files from the Files app. Each one shows its
+   progress, then *Saved*, or *Saved as …* when its name was taken.
+4. Close the dialog to stop. The log pane lists what arrived.
+
+A file never replaces one already in the folder: it gets a number, as in
+`photo (1).jpg`. Names are made safe for every OS: folder parts are dropped,
+characters Windows refuses become `_`, and a leading `.` becomes `_`, so
+nothing hidden (a `.zshrc`, a `.git`) can be dropped in. Files are received
+only into a folder on this computer, not into `ssh://`, `s3://` or an archive.
+
+### First use
+
 The first time, the operating system may ask whether XeFM (or Python) may
 accept incoming connections. Allow it on private networks, or the other device
 cannot connect.
@@ -69,9 +93,14 @@ the remote machine's network, and the dialog says so.
   open, so share it only with the devices you mean.
 - The connection is plain HTTP: someone on the same network could read the
   files as they go by. Do not share on a public or untrusted network.
-- Nothing can be uploaded, changed or deleted. Only what you selected is
-  offered: inside a shared folder, names starting with `.` and symbolic links
-  are left out, and no path leads outside the folder.
+- Sharing takes nothing: nothing can be uploaded, changed or deleted. Only
+  what you selected is offered: inside a shared folder, names starting with
+  `.` and symbolic links are left out, and no path leads outside the folder.
+- Receiving gives nothing: the link reads no file on this computer. Anyone
+  who has it can send files into the folder while the dialog is open, so the
+  same care applies. Nothing is overwritten, a sent file is written under a
+  hidden temporary name until it is complete, and a send larger than the
+  free space is refused before it starts.
 
 ## Settings
 

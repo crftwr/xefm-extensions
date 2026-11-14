@@ -6,7 +6,11 @@ One :class:`Share` holds what is offered; :class:`ShareServer` serves it on a
 thread of its own until ``stop()``, or until nothing has asked for anything
 for the idle time."""
 
+import json
 import logging
+import os
+import secrets
+import shutil
 import socket
 import threading
 import time
@@ -33,11 +37,18 @@ class Share:
     """What one share offers and how. ``items`` are :class:`Item`; ``title``
     heads the page."""
 
-    def __init__(self, items, token, *, title="Shared files", include_hidden=False):
+    def __init__(self, items, token, *, title="Shared files", include_hidden=False,
+                 upload_dir=None):
         self.items = list(items)
         self.token = token
         self.title = title
         self.include_hidden = include_hidden
+        # A receiving share: files sent from the page are saved here, a local
+        # folder (pathlib.Path). None for a share that only gives.
+        self.upload_dir = upload_dir
+        self.received = []                      # (saved name, size), in order
+        self._received_lock = threading.Lock()
+        self.claim_lock = threading.Lock()
         # Storage that is not the local disk (SSH, S3, an archive) is read by
         # one request at a time: this code cannot know how many readers such a
         # backend takes at once, and a browser opens several connections.
@@ -45,6 +56,46 @@ class Share:
 
     def lock_for(self, path):
         return self.remote_lock if "://" in str(path) else _NO_LOCK
+
+    def received_files(self):
+        with self._received_lock:
+            return list(self.received)
+
+    def note_received(self, name, size):
+        with self._received_lock:
+            self.received.append((name, size))
+
+
+class _Refused(Exception):
+    """An upload turned away before its body was read: the status and the
+    text the page shows."""
+
+    def __init__(self, status, text):
+        super().__init__(text)
+        self.status, self.text = status, text
+
+
+def claim_name(part, folder, name, claim_lock):
+    """Give the finished upload ``part`` its name in ``folder``: ``name``, or
+    the first free ``name (n)``. Never replaces a file. A hard link fails
+    when the name is taken, which is the check and the claim in one step;
+    where links are not possible (FAT, exFAT, some network shares) the name
+    is checked and the file renamed under ``claim_lock``."""
+    for candidate in logic.candidate_names(name):
+        target = folder / candidate
+        try:
+            os.link(part, target)
+        except FileExistsError:
+            continue
+        except (OSError, NotImplementedError, AttributeError):
+            with claim_lock:
+                if os.path.lexists(target):
+                    continue
+                os.rename(part, target)
+            return candidate
+        os.unlink(part)
+        return candidate
+    raise _Refused(HTTPStatus.CONFLICT, "too many files with this name")
 
 
 class _NoLock:
@@ -189,7 +240,10 @@ class _Handler(BaseHTTPRequestHandler):
     def do_HEAD(self):                          # noqa: N802
         self._serve(body=False)
 
-    def _serve(self, body):
+    def do_POST(self):                          # noqa: N802
+        self._serve(body=True, post=True)
+
+    def _serve(self, body, post=False):
         share = self.server.share
         self.server.touch()
         self._headers_sent = False              # one handler, many requests
@@ -197,12 +251,23 @@ class _Handler(BaseHTTPRequestHandler):
         try:
             if route is None:
                 raise _NotFound
-            if route.kind == "index":
+            if post:
+                if route.kind != "upload" or share.upload_dir is None:
+                    raise _NotFound
+                self._upload(share, route)
+            elif route.kind == "upload":
+                raise _NotFound
+            elif route.kind == "index":
                 self._index(share, route, body)
             else:
                 self._item(share, route, body)
         except _NotFound:
+            if post:
+                self.close_connection = True    # its body is still unread
             self._plain(HTTPStatus.NOT_FOUND, "Not found", body)
+        except _Refused as refused:
+            self.close_connection = True
+            self._plain(refused.status, refused.text, body)
         except (BrokenPipeError, ConnectionError, socket.timeout):
             self.close_connection = True        # the client went away
         except Exception as exc:                # a file that cannot be read
@@ -212,7 +277,10 @@ class _Handler(BaseHTTPRequestHandler):
                 self.close_connection = True    # mid-body: cut it short
                 self._abort()
             else:
-                self._plain(HTTPStatus.INTERNAL_SERVER_ERROR, "Could not read", body)
+                if post:
+                    self.close_connection = True
+                self._plain(HTTPStatus.INTERNAL_SERVER_ERROR,
+                            "Could not save" if post else "Could not read", body)
         finally:
             self.server.touch()
 
@@ -266,8 +334,11 @@ class _Handler(BaseHTTPRequestHandler):
             rows.append((item.name, href, item.is_dir, size,
                          href + ("?zip" if item.is_dir else "?dl")))
         zip_href = f"/{token}/?zip" if len(share.items) > 1 else None
+        upload_folder = share.upload_dir.name or str(share.upload_dir) \
+            if share.upload_dir is not None else None
         self._html(logic.render_page(share.title, [(share.title, None)], rows,
-                                     zip_href=zip_href), body)
+                                     zip_href=zip_href, upload_folder=upload_folder),
+                   body)
 
     def _size(self, share, path):
         try:
@@ -371,6 +442,68 @@ class _Handler(BaseHTTPRequestHandler):
                 left -= len(data)
                 self.server.touch()
 
+    # --- uploads ------------------------------------------------------------ #
+
+    def _upload(self, share, route):
+        folder = share.upload_dir
+        try:
+            length = int(self.headers.get("Content-Length", ""))
+        except ValueError:
+            raise _Refused(HTTPStatus.LENGTH_REQUIRED, "the size was not sent") from None
+        if length < 0:
+            raise _Refused(HTTPStatus.BAD_REQUEST, "the size was not sent")
+        name = logic.upload_name(route.params.get("name", ""))
+        if name is None:
+            raise _Refused(HTTPStatus.BAD_REQUEST, "the file has no usable name")
+        try:
+            free = shutil.disk_usage(folder).free
+        except OSError:
+            raise _Refused(HTTPStatus.INTERNAL_SERVER_ERROR,
+                           "the folder is not there any more") from None
+        if length >= free:
+            raise _Refused(HTTPStatus.INSUFFICIENT_STORAGE,
+                           "not enough space on the computer")
+
+        part = folder / f".xefm-upload-{secrets.token_hex(6)}.part"
+        try:
+            with open(part, "xb") as out:
+                left = length
+                while left > 0:
+                    data = self.rfile.read(min(CHUNK, left))
+                    if not data:
+                        break
+                    out.write(data)
+                    left -= len(data)
+                    self.server.touch()
+            if left > 0:                        # the sender went away
+                self.close_connection = True
+                self._discard(part)
+                return
+            mtime = logic.upload_mtime(route.params.get("mtime"))
+            if mtime is not None:
+                try:
+                    os.utime(part, (mtime, mtime))
+                except (OSError, OverflowError, ValueError):
+                    pass
+            saved = claim_name(part, folder, name, share.claim_lock)
+        except BaseException:
+            self._discard(part)
+            raise
+        share.note_received(saved, length)
+        logger.info("lan-share: received %s (%s) into %s", saved,
+                    logic.format_size(length), folder)
+        data = json.dumps({"name": saved, "size": length}).encode()
+        self._begin(HTTPStatus.CREATED, {"Content-Type": "application/json",
+                                         "Content-Length": str(len(data))})
+        self.wfile.write(data)
+
+    @staticmethod
+    def _discard(part):
+        try:
+            os.unlink(part)
+        except OSError:
+            pass
+
     def _zip(self, share, name, roots, body):
         # No Content-Length: the size is not known until the last file is
         # read. The end of the connection ends the body.
@@ -389,6 +522,9 @@ class _Handler(BaseHTTPRequestHandler):
 class _Server(ThreadingHTTPServer):
     daemon_threads = True
     allow_reuse_address = False
+    # socketserver's default backlog is 5; a browser opens several connections
+    # at once, and past the backlog macOS resets the newcomers.
+    request_queue_size = 64
 
     def __init__(self, address, share):
         super().__init__(address, _Handler)
