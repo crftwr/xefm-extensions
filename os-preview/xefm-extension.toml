@@ -1,6 +1,6 @@
 [extension]
 id = "os-preview"
-version = "0.1.0"
+version = "0.1.1"
 api_version = 1
 name = "OS Preview"
 description = "Show files in the OS preview: Quick Look on macOS, which plays audio and video and shows Office documents"

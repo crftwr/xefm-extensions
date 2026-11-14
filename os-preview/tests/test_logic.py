@@ -1,6 +1,8 @@
 """The plain functions: which entries are previewed and what is run."""
 
 import os
+import subprocess
+import sys
 from types import SimpleNamespace
 
 from os_preview import logic, quicklook_helper
@@ -85,3 +87,16 @@ def test_helper_drops_missing_files(tmp_path, capsys):
         == [str(there)]
     assert quicklook_helper.main([str(tmp_path / "gone")]) == 2
     assert "none of the files exist" in capsys.readouterr().err
+
+
+def test_system_log_is_dropped_but_python_errors_are_kept():
+    # What AppKit writes goes to fd 2 directly; sys.stderr is Python's own.
+    code = ("import os, sys; from os_preview import quicklook_helper as q; "
+            "q.quiet_system_log(); os.write(2, b'IMK noise\\n'); "
+            "sys.stderr.write('helper message\\n')")
+    run = subprocess.run([sys.executable, "-c", code], capture_output=True,
+                         text=True, cwd=os.path.dirname(os.path.dirname(
+                             os.path.abspath(__file__))))
+    assert run.returncode == 0
+    assert "IMK noise" not in run.stderr
+    assert "helper message" in run.stderr

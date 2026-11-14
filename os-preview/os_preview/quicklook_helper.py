@@ -35,6 +35,26 @@ def existing(paths):
     return [os.path.abspath(p) for p in paths if os.path.exists(p)]
 
 
+def quiet_system_log():
+    """Send what the system writes to standard error to /dev/null, and keep
+    Python's own ``sys.stderr`` (this helper's messages, a traceback) on the
+    real one.
+
+    XeFM shows a program's standard error in its log, and AppKit writes
+    diagnostics there that mean nothing to the user. With a Japanese input
+    source, every run printed ``error messaging the mach port for
+    IMKCFRunLoopWakeUpReliable`` (InputMethodKit, about a process that is
+    not an app bundle). Those go to file descriptor 2 directly, so that is
+    what is redirected."""
+    sys.stderr.flush()
+    kept = os.dup(2)
+    null = os.open(os.devnull, os.O_WRONLY)
+    os.dup2(null, 2)
+    os.close(null)
+    sys.stderr = os.fdopen(kept, "w", buffering=1, encoding="utf-8",
+                           errors="replace")
+
+
 def run_qlmanage(paths):
     """Replace this process with ``qlmanage -p``, its diagnostics discarded."""
     null = os.open(os.devnull, os.O_WRONLY)
@@ -170,6 +190,7 @@ def main(argv):
         import Quartz    # noqa: F401
     except ImportError:
         run_qlmanage(paths)
+    quiet_system_log()
     run_panel(paths)
     return 0
 
