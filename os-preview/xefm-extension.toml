@@ -1,0 +1,20 @@
+[extension]
+id = "os-preview"
+version = "0.1.0"
+api_version = 1
+name = "OS Preview"
+description = "Show files in the OS preview: Quick Look on macOS, which plays audio and video and shows Office documents"
+min_xefm = "1.10.0"
+platforms = ["macos"]
+homepage = "https://github.com/crftwr/xefm-extensions/tree/main/os-preview"
+updates = "github:crftwr/xefm-extensions/os-preview"
+
+[contributes.actions]
+"preview.show" = "os_preview.actions:show"
+
+[contributes.menus]
+"preview.show" = { menus = ["file", "context"], label = "Quick Look", when = "entry" }
+
+# Shift-Q: free in every preset, and a terminal can send it.
+[contributes.key_suggestions]
+"preview.show" = ["Shift-Q"]
