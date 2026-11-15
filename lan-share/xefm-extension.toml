@@ -1,0 +1,20 @@
+[extension]
+id = "lan-share"
+version = "0.1.0"
+api_version = 1
+name = "LAN Share"
+description = "Share files on the local network, or receive them: a link and a QR code, opened in any browser"
+min_xefm = "1.16.0"
+homepage = "https://github.com/crftwr/xefm-extensions/tree/main/lan-share"
+updates = "github:crftwr/xefm-extensions/lan-share"
+
+[contributes.actions]
+"lan-share.share" = "lan_share.actions:share"
+"lan-share.receive" = "lan_share.actions:receive"
+
+[contributes.menus]
+"lan-share.share" = { menus = ["file", "context"], label = "Share on Local Network…", when = "entry" }
+"lan-share.receive" = { menus = ["file"], label = "Receive Files on Local Network…" }
+
+[settings]
+defaults = "lan_share.settings:Settings"

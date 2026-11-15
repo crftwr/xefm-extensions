@@ -9,6 +9,7 @@ manager. Each folder is one package with its own `xefm-extension.toml`.
 | [compute-hash](compute-hash/) | MD5 / SHA-1 / SHA-256 / SHA-512 / BLAKE2b digests of the selected files |
 | [git](git/) | Git status before each name, the changed files as one list, any revision as a read-only folder, diffs against it |
 | [images-to-pdf](images-to-pdf/) | Combine the selected images into one PDF |
+| [lan-share](lan-share/) | Share files on the local network, or receive them from a phone: a link and a QR code, opened in any browser |
 | [line-count](line-count/) | Lines, words and characters of the selected files and folders |
 | [media-info](media-info/) | Photo EXIF, audio tags and video streams in File Details, as columns and to sort by |
 | [os-preview](os-preview/) | Show the selected files in Quick Look: play audio and video, view Office documents (macOS; Windows coming soon) |
