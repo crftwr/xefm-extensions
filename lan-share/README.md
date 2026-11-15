@@ -6,7 +6,12 @@ QR code; a phone or any other device on the same network opens it in a
 browser and downloads the files, or sends its own. Nothing is installed on the
 other device.
 
-![LAN Share in XeFM's terminal UI: four files selected, Share on Local Network in the context menu, the dialog with the link and a QR code, and sharing stopped when it closes](docs/demo.gif)
+![LAN Share in XeFM's terminal UI: four files selected and shared from the context menu, the dialog with the link and a QR code; then Receive Files on Local Network from the File menu in the other pane, three photos arriving from a phone, one of them saved as IMG_3102 (1) beside the file already there, and the log listing what was received](docs/demo.gif)
+
+What the phone shows, sharing on the left and receiving on the right:
+
+<img src="docs/browser.png" width="856" alt="Two phone browser pages. Shared files: four files with their sizes, a Download button on each and Download all as ZIP. Send files: a Choose files to send button, and three photos sent, two Saved and one Saved as IMG_3102 (1).jpg">
+
 
 - Files download, or play in the browser: videos seek, because the server
   answers range requests.
